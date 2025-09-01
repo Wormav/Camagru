@@ -7,9 +7,10 @@ require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/core/Router.php';
 require_once __DIR__ . '/core/Controller.php';
 require_once __DIR__ . '/core/Database.php';
-require_once __DIR__ . '/temp_stubs.php';
 
 require_once __DIR__ . '/controllers/GalleryController.php';
+require_once __DIR__ . '/models/User.php';
+require_once __DIR__ . '/models/Image.php';
 
 function loadEnv($path) {
     if (!file_exists($path)) {
