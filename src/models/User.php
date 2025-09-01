@@ -7,19 +7,17 @@ class User {
         $this->db = DatabaseConfig::getConnection();
     }
 
-    public function create($username, $email, $password) {
+    public function create($username, $email, $password, $verificationToken = null) {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $verificationToken = bin2hex(random_bytes(32));
+        $token = $verificationToken ?: bin2hex(random_bytes(32));
 
         $stmt = $this->db->prepare("
             INSERT INTO users (username, email, password_hash, verification_token)
             VALUES (?, ?, ?, ?)
         ");
 
-        return $stmt->execute([$username, $email, $hashedPassword, $verificationToken]);
-    }
-
-    public function findByUsername($username) {
+        return $stmt->execute([$username, $email, $hashedPassword, $token]);
+    }    public function findByUsername($username) {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE username = ?");
         $stmt->execute([$username]);
         return $stmt->fetch();

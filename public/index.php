@@ -10,6 +10,7 @@ $router->get('/login', 'AuthController@loginForm');
 $router->post('/login', 'AuthController@login');
 $router->get('/register', 'AuthController@registerForm');
 $router->post('/register', 'AuthController@register');
+$router->get('/verify', 'AuthController@verify');
 $router->get('/logout', 'AuthController@logout');
 $router->get('/camera', 'CameraController@index');
 $router->post('/camera/capture', 'CameraController@capture');

@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+                <div class="flex items-center space-x-4">
+                    <a href="/gallery" class="text-gray-700 hover:text-gray-900">Gallery</a>
+                    <a href="/camera" class="text-gray-700 hover:text-gray-900">Camera</a>
+                    <a href="/register" class="text-gray-700 hover:text-gray-900">Register</a>
+                    <a href="/login" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Login</a>
+                </div> lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,6 +38,7 @@
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
                     <a href="/gallery" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Gallery</a>
                     <a href="/camera" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Camera</a>
+                    <a href="/register" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Register</a>
                     <a href="/login" class="block px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">Login</a>
                 </div>
             </div>
