@@ -1,0 +1,123 @@
+# Environnement
+.env
+.env.local
+.env.production
+.env.staging
+config/database.php
+
+# Système macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Files windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Files Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.buildpath
+.copilot-*
+.cursor/
+
+# Logs
+*.log
+logs/
+log/
+error.log
+access.log
+php_errors.log
+
+# Cache et temporary
+cache/
+tmp/
+temp/
+*.tmp
+*.cache
+.cache/
+
+# Upload et medias
+uploads/
+media/user_uploads/
+public/uploads/
+storage/uploads/
+images/user_content/
+
+# Lib
+vendor/
+node_modules/
+composer.lock
+package-lock.json
+yarn.lock
+
+# Compilation CSS
+*.css.map
+dist/
+build/
+
+# DB_local
+*.sqlite
+*.sqlite3
+*.db
+database.db
+backup.sql
+
+# Docker volumes
+docker-data/
+mysql-data/
+postgres-data/
+.docker/
+
+# Session files
+sessions/
+tmp/sessions/
+
+# Backup files
+*.bak
+*.backup
+backup/
+backups/
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Documentation
+docs/generated/
+phpdoc/
+
+# Tests and coverage
+coverage/
+.phpunit.result.cache
+tests/_output/
+
+# Certificats and clés
+*.pem
+*.key
+*.crt
+*.p12
+ssl/
+
+# Email templates
+email_templates_cache/
