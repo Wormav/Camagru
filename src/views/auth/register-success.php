@@ -1,0 +1,23 @@
+<div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6 mt-8">
+    <div class="text-center">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Registration Successful!</h2>
+
+        <p class="text-gray-600 mb-6">
+            We've sent a verification email to <strong><?= htmlspecialchars($email) ?></strong>
+        </p>
+
+        <p class="text-sm text-gray-500 mb-6">
+            Please check your email and click the verification link to activate your account.
+        </p>
+
+        <a href="/login" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md">
+            Go to Login
+        </a>
+    </div>
+</div>

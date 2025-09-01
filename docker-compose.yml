@@ -1,0 +1,42 @@
+services:
+  camagru-app:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html/src
+      - ./public:/var/www/html/public
+      - ./assets:/var/www/html/assets
+      - ./config:/var/www/html/config
+      - ./uploads:/var/www/html/uploads
+    environment:
+      - DB_HOST=camagru-db
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - camagru-db
+    networks:
+      - camagru-network
+
+  camagru-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - camagru-network
+
+volumes:
+  mysql-data:
+
+networks:
+  camagru-network:
+    driver: bridge
