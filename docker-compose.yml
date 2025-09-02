@@ -8,12 +8,19 @@ services:
       - ./public:/var/www/html/public
       - ./assets:/var/www/html/assets
       - ./config:/var/www/html/config
-      - ./uploads:/var/www/html/uploads
+      - ./.env:/var/www/html/.env
     environment:
       - DB_HOST=camagru-db
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_FROM=${MAIL_FROM}
+      - APP_URL=${APP_URL}
+      - APP_ENV=${APP_ENV}
     depends_on:
       - camagru-db
     networks:

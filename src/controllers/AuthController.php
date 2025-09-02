@@ -3,14 +3,35 @@
 class AuthController extends Controller {
 
     public function registerForm() {
+
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/gallery');
+            return;
+        }
+
         $this->view('auth/register', [
             'title' => 'Register - Camagru'
         ]);
     }
 
     public function register() {
+
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/gallery');
+            return;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/register');
+            return;
+        }
+
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $this->view('auth/register', [
+                'title' => 'Register - Camagru',
+                'errors' => ['Token CSRF invalide. Veuillez réessayer.']
+            ]);
             return;
         }
 
@@ -89,6 +110,287 @@ class AuthController extends Controller {
         } else {
             $this->view('auth/verify-error', [
                 'title' => 'Verification Error - Camagru'
+            ]);
+        }
+    }
+
+    public function loginForm() {
+
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/gallery');
+            return;
+        }
+
+        $this->view('auth/login', [
+            'title' => 'Login - Camagru'
+        ]);
+    }
+
+    public function login() {
+
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/gallery');
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/login');
+            return;
+        }
+
+        // Validation CSRF
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $this->view('auth/login', [
+                'title' => 'Login - Camagru',
+                'errors' => ['Token CSRF invalide. Veuillez réessayer.']
+            ]);
+            return;
+        }
+
+        $login = trim($_POST['login'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        $errors = [];
+
+        if (empty($login)) {
+            $errors[] = 'Username or email is required';
+        }
+
+        if (empty($password)) {
+            $errors[] = 'Password is required';
+        }
+
+        if (!empty($errors)) {
+            $this->view('auth/login', [
+                'title' => 'Login - Camagru',
+                'errors' => $errors,
+                'login' => $login
+            ]);
+            return;
+        }
+
+        $userModel = new User();
+        $user = $userModel->findByUsernameOrEmail($login);
+
+        if (!$user || !password_verify($password, $user['password_hash'])) {
+            $this->view('auth/login', [
+                'title' => 'Login - Camagru',
+                'errors' => ['Invalid username/email or password'],
+                'login' => $login
+            ]);
+            return;
+        }
+
+        if (!$user['email_verified']) {
+            $this->view('auth/login', [
+                'title' => 'Login - Camagru',
+                'errors' => ['Please verify your email before logging in'],
+                'login' => $login
+            ]);
+            return;
+        }
+
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['email'] = $user['email'];
+        $_SESSION['profile_picture'] = $user['profile_picture'];
+
+        $this->redirect('/gallery');
+    }
+
+    public function logout() {
+        session_destroy();
+        $this->redirect('/');
+    }
+
+    public function forgotPasswordForm() {
+
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/gallery');
+            return;
+        }
+
+        $this->view('auth/forgot-password', [
+            'title' => 'Forgot Password - Camagru'
+        ]);
+    }
+
+    public function forgotPassword() {
+
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/gallery');
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/forgot-password');
+            return;
+        }
+
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $this->view('auth/forgot-password', [
+                'title' => 'Forgot Password - Camagru',
+                'errors' => ['Token CSRF invalide. Veuillez réessayer.']
+            ]);
+            return;
+        }
+
+        $email = trim($_POST['email'] ?? '');
+
+        if (empty($email)) {
+            $this->view('auth/forgot-password', [
+                'title' => 'Forgot Password - Camagru',
+                'errors' => ['Email is required'],
+                'email' => $email
+            ]);
+            return;
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->view('auth/forgot-password', [
+                'title' => 'Forgot Password - Camagru',
+                'errors' => ['Please enter a valid email address'],
+                'email' => $email
+            ]);
+            return;
+        }
+
+        $userModel = new User();
+        $user = $userModel->findByEmail($email);
+
+        if (!$user) {
+            $this->view('auth/forgot-password', [
+                'title' => 'Forgot Password - Camagru',
+                'errors' => ['No account found with this email address'],
+                'email' => $email
+            ]);
+            return;
+        }
+
+        $resetToken = bin2hex(random_bytes(32));
+
+        if ($userModel->createResetToken($user['id'], $resetToken)) {
+
+            $emailSender = new EmailSender();
+            $emailSender->sendPasswordResetEmail($email, $user['username'], $resetToken);
+
+            $this->view('auth/forgot-password-sent', [
+                'title' => 'Reset Link Sent - Camagru',
+                'email' => $email
+            ]);
+        } else {
+            $this->view('auth/forgot-password', [
+                'title' => 'Forgot Password - Camagru',
+                'errors' => ['An error occurred. Please try again later.'],
+                'email' => $email
+            ]);
+        }
+    }
+
+    public function resetPasswordForm() {
+
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/gallery');
+            return;
+        }
+
+        $token = $_GET['token'] ?? '';
+
+        if (empty($token)) {
+            $this->view('auth/reset-error', [
+                'title' => 'Reset Error - Camagru'
+            ]);
+            return;
+        }
+
+        $userModel = new User();
+        $user = $userModel->findByResetToken($token);
+
+        if (!$user) {
+            $this->view('auth/reset-error', [
+                'title' => 'Reset Error - Camagru'
+            ]);
+            return;
+        }
+
+        $this->view('auth/reset-password', [
+            'title' => 'Reset Password - Camagru',
+            'token' => $token
+        ]);
+    }
+
+    public function resetPassword() {
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/gallery');
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/forgot-password');
+            return;
+        }
+
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $this->view('auth/reset-error', [
+                'title' => 'Reset Error - Camagru'
+            ]);
+            return;
+        }
+
+        $token = $_POST['token'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (empty($token)) {
+            $this->view('auth/reset-error', [
+                'title' => 'Reset Error - Camagru'
+            ]);
+            return;
+        }
+
+        $errors = [];
+
+        if (empty($password)) {
+            $errors[] = 'Password is required';
+        } elseif (strlen($password) < PASSWORD_MIN_LENGTH) {
+            $errors[] = 'Password must be at least ' . PASSWORD_MIN_LENGTH . ' characters';
+        } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $password)) {
+            $errors[] = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+        }
+
+        if ($password !== $confirmPassword) {
+            $errors[] = 'Passwords do not match';
+        }
+
+        if (!empty($errors)) {
+            $this->view('auth/reset-password', [
+                'title' => 'Reset Password - Camagru',
+                'errors' => $errors,
+                'token' => $token
+            ]);
+            return;
+        }
+
+        $userModel = new User();
+        $user = $userModel->findByResetToken($token);
+
+        if (!$user) {
+            $this->view('auth/reset-error', [
+                'title' => 'Reset Error - Camagru'
+            ]);
+            return;
+        }
+
+        if ($userModel->resetPassword($user['id'], $password)) {
+            $this->view('auth/reset-success', [
+                'title' => 'Password Reset - Camagru'
+            ]);
+        } else {
+            $this->view('auth/reset-error', [
+                'title' => 'Reset Error - Camagru'
             ]);
         }
     }

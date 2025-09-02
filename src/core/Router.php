@@ -20,9 +20,44 @@ class Router {
 
             $controllerInstance = new $controller();
             $controllerInstance->$action();
-        } else {
-            http_response_code(404);
-            echo "404 - Page not found";
+            return;
         }
+
+        foreach ($this->routes[$method] as $route => $handler) {
+            if ($this->matchRoute($route, $path)) {
+                $params = $this->extractParams($route, $path);
+                list($controller, $action) = explode('@', $handler);
+
+                $controllerInstance = new $controller();
+
+                if (!empty($params)) {
+                    call_user_func_array([$controllerInstance, $action], $params);
+                } else {
+                    $controllerInstance->$action();
+                }
+                return;
+            }
+        }
+
+        http_response_code(404);
+        echo "404 - Page not found";
+    }
+
+    private function matchRoute($route, $path) {
+        $routePattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route);
+        $routePattern = '#^' . $routePattern . '$#';
+        return preg_match($routePattern, $path);
+    }
+
+    private function extractParams($route, $path) {
+        $routePattern = preg_replace('/\{[^}]+\}/', '([^/]+)', $route);
+        $routePattern = '#^' . $routePattern . '$#';
+
+        if (preg_match($routePattern, $path, $matches)) {
+            array_shift($matches);
+            return $matches;
+        }
+
+        return [];
     }
 }
