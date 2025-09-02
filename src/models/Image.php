@@ -46,6 +46,12 @@ class Image {
         return $stmt->fetchAll();
     }
 
+    public function getById($imageId) {
+        $stmt = $this->db->prepare("SELECT * FROM images WHERE id = ?");
+        $stmt->execute([$imageId]);
+        return $stmt->fetch();
+    }
+
     public function delete($imageId, $userId) {
         $stmt = $this->db->prepare("DELETE FROM images WHERE id = ? AND user_id = ?");
         return $stmt->execute([$imageId, $userId]);

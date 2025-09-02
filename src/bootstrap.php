@@ -67,5 +67,6 @@ require_once __DIR__ . '/core/SecurityHeaders.php';
 require_once __DIR__ . '/controllers/GalleryController.php';
 require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/ProfileController.php';
+require_once __DIR__ . '/controllers/CameraController.php';
 require_once __DIR__ . '/models/User.php';
 require_once __DIR__ . '/models/Image.php';

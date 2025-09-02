@@ -74,6 +74,15 @@ function capturePhoto() {
         formData.append('image', blob, 'capture.png');
         formData.append('overlay', selectedOverlay);
 
+        // Ajouter le token CSRF
+        const csrfToken = document.getElementById('csrf-token')?.dataset.token;
+        console.log('CSRF Token found:', csrfToken); // Debug
+        if (csrfToken) {
+            formData.append('csrf_token', csrfToken);
+        } else {
+            console.error('No CSRF token found!');
+        }
+
         fetch('/camera/capture', {
             method: 'POST',
             body: formData
@@ -84,12 +93,12 @@ function capturePhoto() {
                 alert('Photo captured successfully!');
                 location.reload();
             } else {
-                alert('Error: ' + data.message);
+                alert('Error: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Upload error');
+            alert('Error: undefined');
         });
     }, 'image/png');
 }
@@ -107,6 +116,15 @@ function handleFileUpload(event) {
     formData.append('image', file);
     formData.append('overlay', selectedOverlay);
 
+    // Ajouter le token CSRF
+    const csrfToken = document.getElementById('csrf-token')?.dataset.token;
+    console.log('CSRF Token found in upload:', csrfToken); // Debug
+    if (csrfToken) {
+        formData.append('csrf_token', csrfToken);
+    } else {
+        console.error('No CSRF token found in upload!');
+    }
+
     fetch('/camera/capture', {
         method: 'POST',
         body: formData
@@ -117,11 +135,43 @@ function handleFileUpload(event) {
             alert('Image uploaded successfully!');
             location.reload();
         } else {
-            alert('Error: ' + data.message);
+            alert('Error: ' + (data.message || 'Unknown error'));
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Upload error');
+        alert('Error: undefined');
+    });
+}
+
+function deleteImage(imageId) {
+    if (!confirm('Are you sure you want to delete this image?')) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('image_id', imageId);
+
+    // Ajouter le token CSRF
+    const csrfToken = document.getElementById('csrf-token')?.dataset.token;
+    if (csrfToken) {
+        formData.append('csrf_token', csrfToken);
+    }
+
+    fetch('/camera/delete', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + (data.message || 'Failed to delete image'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting image');
     });
 }

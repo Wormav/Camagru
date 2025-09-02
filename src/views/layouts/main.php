@@ -33,7 +33,9 @@ SecurityHeaders::setSecurityHeaders();
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-4">
                     <a href="/gallery" class="text-gray-700 hover:text-gray-900">Gallery</a>
-                    <a href="/camera" class="text-gray-700 hover:text-gray-900">Camera</a>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <a href="/camera" class="text-gray-700 hover:text-gray-900">Camera</a>
+                    <?php endif; ?>
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <!-- Profile Picture -->
                         <div class="relative">
@@ -75,7 +77,9 @@ SecurityHeaders::setSecurityHeaders();
             <div id="mobile-menu" class="md:hidden hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
                     <a href="/gallery" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Gallery</a>
-                    <a href="/camera" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Camera</a>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <a href="/camera" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Camera</a>
+                    <?php endif; ?>
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <!-- Profile in mobile menu -->
                         <a href="/profile" class="flex items-center px-3 py-2 text-gray-700 hover:text-gray-900">
