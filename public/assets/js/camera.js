@@ -1,5 +1,6 @@
 let video, canvas, stream;
-let selectedOverlay = null;
+let selectedFrame = null;
+let selectedEmoji = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     video = document.getElementById('video');
@@ -8,17 +9,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const startButton = document.getElementById('start-camera');
     const captureButton = document.getElementById('capture');
     const fileUpload = document.getElementById('file-upload');
-    const overlayOptions = document.querySelectorAll('.overlay-option');
+    const frameOptions = document.querySelectorAll('.frame-option');
+    const emojiOptions = document.querySelectorAll('.emoji-option');
 
     startButton.addEventListener('click', startCamera);
     captureButton.addEventListener('click', capturePhoto);
     fileUpload.addEventListener('change', handleFileUpload);
 
-    overlayOptions.forEach(option => {
+    frameOptions.forEach(option => {
         option.addEventListener('click', function() {
-            selectOverlay(this);
+            selectFrame(this);
         });
     });
+
+    emojiOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            selectEmoji(this);
+        });
+    });
+
+    // Initialiser avec "aucun" sélectionné par défaut
+    updateCaptureButton();
 });
 
 async function startCamera() {
@@ -36,8 +47,8 @@ async function startCamera() {
     }
 }
 
-function selectOverlay(element) {
-    document.querySelectorAll('.overlay-option').forEach(opt => {
+function selectFrame(element) {
+    document.querySelectorAll('.frame-option').forEach(opt => {
         opt.classList.remove('border-blue-500', 'bg-blue-50');
         opt.classList.add('border-gray-200');
     });
@@ -45,21 +56,80 @@ function selectOverlay(element) {
     element.classList.remove('border-gray-200');
     element.classList.add('border-blue-500', 'bg-blue-50');
 
-    selectedOverlay = element.dataset.overlay;
+    selectedFrame = element.dataset.frame;
     updateCaptureButton();
+    updatePreview();
+}
+
+function selectEmoji(element) {
+    document.querySelectorAll('.emoji-option').forEach(opt => {
+        opt.classList.remove('border-blue-500', 'bg-blue-50');
+        opt.classList.add('border-gray-200');
+    });
+
+    element.classList.remove('border-gray-200');
+    element.classList.add('border-blue-500', 'bg-blue-50');
+
+    selectedEmoji = element.dataset.emoji;
+    updateCaptureButton();
+    updatePreview();
 }
 
 function updateCaptureButton() {
     const captureButton = document.getElementById('capture');
     const hasVideo = video && !video.paused;
-    const hasOverlay = selectedOverlay !== null;
+    const hasOverlay = (selectedFrame && selectedFrame !== 'none') || (selectedEmoji && selectedEmoji !== 'none');
 
-    captureButton.disabled = !(hasVideo && hasOverlay);
+    const isEnabled = hasVideo && hasOverlay;
+
+    captureButton.disabled = !isEnabled;
+
+    // Mettre à jour les classes CSS selon l'état
+    if (isEnabled) {
+        captureButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+        captureButton.classList.add('bg-blue-500', 'hover:bg-blue-600');
+    } else {
+        captureButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+        captureButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+    }
+}
+
+function updatePreview() {
+    const overlayPreview = document.getElementById('overlay-preview');
+    if (!overlayPreview) return;
+
+    overlayPreview.innerHTML = '';
+
+    // Ajouter le cadre si sélectionné
+    if (selectedFrame && selectedFrame !== 'none') {
+        const frameDiv = document.createElement('div');
+        frameDiv.className = getFrameClass(selectedFrame);
+        overlayPreview.appendChild(frameDiv);
+    }
+
+    // Ajouter l'emoji si sélectionné
+    if (selectedEmoji && selectedEmoji !== 'none') {
+        const emojiDiv = document.createElement('div');
+        emojiDiv.className = 'absolute bottom-2 right-2 text-4xl';
+        emojiDiv.textContent = selectedEmoji;
+        overlayPreview.appendChild(emojiDiv);
+    }
+}
+
+function getFrameClass(frameType) {
+    const frameClasses = {
+        'classic': 'absolute inset-0 border-8 border-amber-600 pointer-events-none',
+        'modern': 'absolute inset-0 border-4 border-gray-800 pointer-events-none',
+        'vintage': 'absolute inset-0 border-8 border-orange-700 pointer-events-none'
+    };
+    return frameClasses[frameType] || '';
 }
 
 function capturePhoto() {
-    if (!selectedOverlay) {
-        alert('Please select an overlay');
+    const hasOverlay = (selectedFrame && selectedFrame !== 'none') || (selectedEmoji && selectedEmoji !== 'none');
+
+    if (!hasOverlay) {
+        alert('Please select at least one frame or emoji');
         return;
     }
 
@@ -72,7 +142,8 @@ function capturePhoto() {
     canvas.toBlob(function(blob) {
         const formData = new FormData();
         formData.append('image', blob, 'capture.png');
-        formData.append('overlay', selectedOverlay);
+        formData.append('frame', selectedFrame || 'none');
+        formData.append('emoji', selectedEmoji || 'none');
 
         // Ajouter le token CSRF
         const csrfToken = document.getElementById('csrf-token')?.dataset.token;
@@ -107,14 +178,17 @@ function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (!selectedOverlay) {
-        alert('Please select an overlay');
+    const hasOverlay = (selectedFrame && selectedFrame !== 'none') || (selectedEmoji && selectedEmoji !== 'none');
+
+    if (!hasOverlay) {
+        alert('Please select at least one frame or emoji');
         return;
     }
 
     const formData = new FormData();
     formData.append('image', file);
-    formData.append('overlay', selectedOverlay);
+    formData.append('frame', selectedFrame || 'none');
+    formData.append('emoji', selectedEmoji || 'none');
 
     // Ajouter le token CSRF
     const csrfToken = document.getElementById('csrf-token')?.dataset.token;

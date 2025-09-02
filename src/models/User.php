@@ -77,13 +77,20 @@ class User {
         return $stmt->fetch();
     }
 
-    public function updateProfile($userId, $username, $email) {
-        $stmt = $this->db->prepare("
-            UPDATE users
-            SET username = ?, email = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        ");
-        return $stmt->execute([$username, $email, $userId]);
+    public function updateProfile($userId, $username, $email, $notificationsEnabled = null) {
+        $sql = "UPDATE users SET username = ?, email = ?, updated_at = CURRENT_TIMESTAMP";
+        $params = [$username, $email];
+
+        if ($notificationsEnabled !== null) {
+            $sql .= ", notifications_enabled = ?";
+            $params[] = $notificationsEnabled;
+        }
+
+        $sql .= " WHERE id = ?";
+        $params[] = $userId;
+
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($params);
     }
 
     public function updateProfilePicture($userId, $profilePicture) {

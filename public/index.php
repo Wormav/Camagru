@@ -63,4 +63,12 @@ $router->get('/profile', 'ProfileController@index');
 $router->post('/profile/update', 'ProfileController@update');
 $router->post('/profile/upload-picture', 'ProfileController@uploadProfilePicture');
 
+// Routes pour les images
+$router->get('/image/{id}', 'ImageController@show');
+$router->post('/image/like', 'ImageController@like');
+$router->get('/image/like-status', 'ImageController@likeStatus');
+$router->post('/image/comment', 'ImageController@comment');
+$router->get('/image/comments', 'ImageController@getComments');
+$router->post('/image/delete-comment', 'ImageController@deleteComment');
+
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

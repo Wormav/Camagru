@@ -11,26 +11,33 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <?php foreach ($images as $image): ?>
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="h-64 bg-gray-200 overflow-hidden">
-                        <img src="/uploads/<?= htmlspecialchars($image['filename']) ?>"
-                             alt="Photo by <?= htmlspecialchars($image['username']) ?>"
-                             class="w-full h-full object-cover">
-                    </div>
+                    <a href="/image/<?= $image['id'] ?>" class="block">
+                        <div class="h-80 bg-gray-100 flex items-center justify-center p-2">
+                            <img src="/uploads/<?= htmlspecialchars($image['filename']) ?>"
+                                 alt="Photo by <?= htmlspecialchars($image['username']) ?>"
+                                 class="max-w-full max-h-full object-contain hover:scale-105 transition-transform">
+                        </div>
+                    </a>
                     <div class="p-4">
                         <div class="flex items-center justify-between">
                             <div class="flex flex-col">
-                                <span class="text-sm text-gray-500">By <?= htmlspecialchars($image['username']) ?></span>
+                                <a href="/image/<?= $image['id'] ?>" class="text-sm text-gray-500 hover:text-gray-700">
+                                    By <?= htmlspecialchars($image['username']) ?>
+                                </a>
                                 <span class="text-xs text-gray-400"><?= date('M j, Y', strtotime($image['created_at'])) ?></span>
                             </div>
                             <div class="flex space-x-4">
-                                <div class="flex items-center text-red-500">
-                                    <span class="mr-1">♥</span>
-                                    <span class="text-sm"><?= $image['like_count'] ?></span>
+                                <div class="flex items-center">
+                                    <div onclick="<?= isset($_SESSION['user_id']) ? "toggleLike({$image['id']})" : "window.location.href='/login'" ?>"
+                                         class="cursor-pointer hover:scale-110 transition-transform p-1 rounded-full hover:bg-red-50">
+                                        <span class="text-red-500 text-lg heart-<?= $image['id'] ?>">♥</span>
+                                    </div>
+                                    <span class="text-sm like-count-<?= $image['id'] ?> ml-1"><?= $image['like_count'] ?></span>
                                 </div>
-                                <div class="flex items-center text-blue-500">
+                                <a href="/image/<?= $image['id'] ?>" class="flex items-center text-blue-500 hover:text-blue-700">
                                     <span class="mr-1">💬</span>
                                     <span class="text-sm"><?= $image['comment_count'] ?></span>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -105,3 +112,84 @@
         </div>
     <?php endif; ?>
 </div>
+
+<script>
+function toggleLike(imageId) {
+    <?php if (!isset($_SESSION['user_id'])): ?>
+        window.location.href = '/login';
+        return;
+    <?php endif; ?>
+
+    const likeElement = document.querySelector('.like-count-' + imageId);
+    const heartElement = document.querySelector('.heart-' + imageId);
+
+    fetch('/image/like', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `image_id=${imageId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            likeElement.textContent = data.like_count;
+
+            // Mettre à jour l'apparence du cœur
+            if (data.liked) {
+                heartElement.textContent = '❤️'; // Cœur plein
+                heartElement.style.color = '#DC2626';
+            } else {
+                heartElement.textContent = '🤍'; // Cœur vide
+                heartElement.style.color = '#EF4444';
+            }
+
+            // Animation
+            heartElement.style.transform = 'scale(1.3)';
+            setTimeout(() => {
+                heartElement.style.transform = 'scale(1)';
+            }, 150);
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while toggling like');
+    });
+}
+
+// Charger l'état initial des likes
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if (isset($_SESSION['user_id'])): ?>
+        // Pour chaque image, vérifier si elle est likée
+        const imageIds = [<?php
+            $ids = [];
+            foreach ($images as $img) {
+                $ids[] = $img['id'];
+            }
+            echo implode(',', $ids);
+        ?>];
+
+        imageIds.forEach(imageId => {
+            fetch(`/image/like-status?image_id=${imageId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const heartElement = document.querySelector('.heart-' + imageId);
+                    if (heartElement) {
+                        if (data.liked) {
+                            heartElement.textContent = '❤️'; // Cœur plein
+                        } else {
+                            heartElement.textContent = '🤍'; // Cœur vide
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading like status:', error);
+            });
+        });
+    <?php endif; ?>
+});
+</script>

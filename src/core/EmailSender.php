@@ -235,4 +235,31 @@ class EmailSender {
 
         return $result;
     }
+
+    public function send($email, $subject, $message) {
+        $this->log("=== ENVOI EMAIL GÉNÉRIQUE ===");
+        $this->log("Destinataire: $email");
+        $this->log("Sujet: $subject");
+
+        // Toujours essayer d'envoyer via SMTP
+        $this->log("TENTATIVE D'ENVOI SMTP...");
+        try {
+            $result = $this->sendViaSMTP($email, $subject, $message);
+            $this->log("Résultat envoi SMTP: " . ($result ? 'SUCCÈS' : 'ÉCHEC'));
+            return $result;
+        } catch (Exception $e) {
+            $this->log("ERREUR SMTP: " . $e->getMessage());
+
+            // Fallback vers mail()
+            $this->log("Tentative avec mail()...");
+            try {
+                $result = $this->sendViaMail($email, $subject, $message);
+                $this->log("Résultat envoi mail(): " . ($result ? 'SUCCÈS' : 'ÉCHEC'));
+                return $result;
+            } catch (Exception $e) {
+                $this->log("ERREUR mail(): " . $e->getMessage());
+                return false;
+            }
+        }
+    }
 }

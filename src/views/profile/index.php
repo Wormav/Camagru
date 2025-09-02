@@ -171,6 +171,26 @@
                             </div>
                         </div>
 
+                        <!-- Notification Preferences -->
+                        <div class="mt-8">
+                            <h4 class="text-base font-medium text-gray-900 mb-4">Notification Preferences</h4>
+                            <div class="grid grid-cols-6 gap-6">
+                                <div class="col-span-6">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="notifications_enabled" id="notifications_enabled" value="1"
+                                               <?= $user['notifications_enabled'] ? 'checked' : '' ?>
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <label for="notifications_enabled" class="ml-2 block text-sm text-gray-900">
+                                            Receive email notifications when someone comments on my photos
+                                        </label>
+                                    </div>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        When enabled, you'll receive email notifications whenever someone comments on your photos.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="flex justify-end">
                             <button type="submit"
                                     class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">

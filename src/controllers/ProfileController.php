@@ -63,6 +63,7 @@ class ProfileController extends Controller {
         $currentPassword = $_POST['current_password'] ?? '';
         $newPassword = $_POST['new_password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
+        $notificationsEnabled = isset($_POST['notifications_enabled']) ? 1 : 0;
 
         $errors = [];
 
@@ -120,7 +121,7 @@ class ProfileController extends Controller {
         }
 
         // Mettre à jour le profil
-        if ($userModel->updateProfile($_SESSION['user_id'], $username, $email)) {
+        if ($userModel->updateProfile($_SESSION['user_id'], $username, $email, $notificationsEnabled)) {
             // Si un nouveau mot de passe est fourni, le mettre à jour aussi
             if (!empty($newPassword)) {
                 $userModel->updatePassword($_SESSION['user_id'], $newPassword);
