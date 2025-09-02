@@ -24,6 +24,7 @@
     <?php endif; ?>
 
     <form method="POST" action="/forgot-password" class="space-y-4">
+        <?= CSRFProtection::getTokenField() ?>
         <div>
             <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
             <input id="email" name="email" type="email" required

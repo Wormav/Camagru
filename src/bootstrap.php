@@ -61,6 +61,8 @@ require_once __DIR__ . '/core/Router.php';
 require_once __DIR__ . '/core/Controller.php';
 require_once __DIR__ . '/core/Database.php';
 require_once __DIR__ . '/core/EmailSender.php';
+require_once __DIR__ . '/core/CSRFProtection.php';
+require_once __DIR__ . '/core/SecurityHeaders.php';
 
 require_once __DIR__ . '/controllers/GalleryController.php';
 require_once __DIR__ . '/controllers/AuthController.php';

@@ -21,6 +21,7 @@
     <?php endif; ?>
 
     <form method="POST" action="/login" class="space-y-4">
+        <?= CSRFProtection::getTokenField() ?>
         <div>
             <label for="login" class="block text-sm font-medium text-gray-700">Username or Email</label>
             <input type="text" id="login" name="login" required

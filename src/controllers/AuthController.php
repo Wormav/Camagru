@@ -26,6 +26,16 @@ class AuthController extends Controller {
             return;
         }
 
+        // Validation CSRF
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $this->view('auth/register', [
+                'title' => 'Register - Camagru',
+                'errors' => ['Token CSRF invalide. Veuillez réessayer.']
+            ]);
+            return;
+        }
+
         $username = trim($_POST['username'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
@@ -129,6 +139,16 @@ class AuthController extends Controller {
             return;
         }
 
+        // Validation CSRF
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $this->view('auth/login', [
+                'title' => 'Login - Camagru',
+                'errors' => ['Token CSRF invalide. Veuillez réessayer.']
+            ]);
+            return;
+        }
+
         $login = trim($_POST['login'] ?? '');
         $password = $_POST['password'] ?? '';
 
@@ -206,6 +226,16 @@ class AuthController extends Controller {
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/forgot-password');
+            return;
+        }
+
+        // Validation CSRF
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $this->view('auth/forgot-password', [
+                'title' => 'Forgot Password - Camagru',
+                'errors' => ['Token CSRF invalide. Veuillez réessayer.']
+            ]);
             return;
         }
 
@@ -306,6 +336,15 @@ class AuthController extends Controller {
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/forgot-password');
+            return;
+        }
+
+        // Validation CSRF
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $this->view('auth/reset-error', [
+                'title' => 'Reset Error - Camagru'
+            ]);
             return;
         }
 

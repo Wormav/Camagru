@@ -36,6 +36,19 @@ class ProfileController extends Controller {
             return;
         }
 
+        // Validation CSRF
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $userModel = new User();
+            $user = $userModel->findById($_SESSION['user_id']);
+            $this->view('profile/index', [
+                'title' => 'Profile - Camagru',
+                'user' => $user,
+                'errors' => ['Token CSRF invalide. Veuillez réessayer.']
+            ]);
+            return;
+        }
+
         $userModel = new User();
         $user = $userModel->findById($_SESSION['user_id']);
 
@@ -133,6 +146,14 @@ class ProfileController extends Controller {
         }
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/profile');
+            return;
+        }
+
+        // Validation CSRF
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!CSRFProtection::validateToken($csrfToken)) {
+            $_SESSION['error'] = 'Token CSRF invalide. Veuillez réessayer.';
             $this->redirect('/profile');
             return;
         }

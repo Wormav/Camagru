@@ -24,6 +24,7 @@
     <?php endif; ?>
 
     <form method="POST" action="/reset-password" class="space-y-4">
+        <?= CSRFProtection::getTokenField() ?>
         <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
 
         <div>

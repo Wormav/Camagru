@@ -12,6 +12,7 @@
     <?php endif; ?>
 
     <form method="POST" action="/register" class="space-y-4">
+        <?= CSRFProtection::getTokenField() ?>
         <div>
             <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
             <input type="text" id="username" name="username" value="<?= htmlspecialchars($username ?? '') ?>" required

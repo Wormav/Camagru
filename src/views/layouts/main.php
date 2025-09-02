@@ -1,3 +1,7 @@
+<?php
+// Définir les headers de sécurité
+SecurityHeaders::setSecurityHeaders();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

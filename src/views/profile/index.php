@@ -33,6 +33,7 @@
                         </div>
 
                         <form method="POST" action="/profile/upload-picture" enctype="multipart/form-data" class="flex items-center space-x-4">
+                            <?= CSRFProtection::getTokenField() ?>
                             <label class="block">
                                 <span class="sr-only">Choose profile photo</span>
                                 <input type="file" name="profile_picture" id="profile-picture-input" accept="image/*" required
@@ -128,6 +129,7 @@
                     <?php endif; ?>
 
                     <form method="POST" action="/profile/update" class="space-y-6">
+                        <?= CSRFProtection::getTokenField() ?>
                         <div class="grid grid-cols-6 gap-6">
                             <div class="col-span-6 sm:col-span-3">
                                 <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
