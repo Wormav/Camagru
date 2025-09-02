@@ -248,7 +248,7 @@ class AuthController extends Controller {
             // Envoyer l'email
             $emailSender = new EmailSender();
             $emailSender->sendPasswordResetEmail($email, $user['username'], $resetToken);
-            
+
             // Afficher le message de succès
             $this->view('auth/forgot-password-sent', [
                 'title' => 'Reset Link Sent - Camagru',
