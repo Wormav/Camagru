@@ -29,6 +29,12 @@ class User {
         return $stmt->fetch();
     }
 
+    public function findByUsernameOrEmail($login) {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+        $stmt->execute([$login, $login]);
+        return $stmt->fetch();
+    }
+
     public function verifyEmail($token) {
         $stmt = $this->db->prepare("
             UPDATE users
@@ -41,6 +47,27 @@ class User {
     public function updatePassword($userId, $newPassword) {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         $stmt = $this->db->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
+        return $stmt->execute([$hashedPassword, $userId]);
+    }
+
+    public function createResetToken($userId, $resetToken) {
+        $stmt = $this->db->prepare("UPDATE users SET reset_token = ? WHERE id = ?");
+        return $stmt->execute([$resetToken, $userId]);
+    }
+
+    public function findByResetToken($token) {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE reset_token = ?");
+        $stmt->execute([$token]);
+        return $stmt->fetch();
+    }
+
+    public function resetPassword($userId, $newPassword) {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare("
+            UPDATE users
+            SET password_hash = ?, reset_token = NULL
+            WHERE id = ?
+        ");
         return $stmt->execute([$hashedPassword, $userId]);
     }
 }

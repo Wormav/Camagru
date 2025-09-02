@@ -2,18 +2,20 @@
 
 session_start();
 
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/core/Router.php';
-require_once __DIR__ . '/core/Controller.php';
-require_once __DIR__ . '/core/Database.php';
-require_once __DIR__ . '/core/EmailSender.php';
+// Configuration PHP pour masquer les erreurs en production
+if (defined('APP_ENV') && APP_ENV === 'production') {
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(0);
+} else {
+    // En développement, logger les erreurs mais ne pas les afficher
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    ini_set('log_errors', 1);
+    error_reporting(E_ALL);
+}
 
-require_once __DIR__ . '/controllers/GalleryController.php';
-require_once __DIR__ . '/controllers/AuthController.php';
-require_once __DIR__ . '/models/User.php';
-require_once __DIR__ . '/models/Image.php';
-
+// Charger les variables d'environnement EN PREMIER
 function loadEnv($path) {
     if (!file_exists($path)) {
         return;
@@ -38,3 +40,29 @@ function loadEnv($path) {
 }
 
 loadEnv(__DIR__ . '/../.env');
+
+// Maintenant charger les configs qui dépendent des variables d'environnement
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/config.php';
+
+// Configuration PHP pour masquer les erreurs
+if (defined('APP_ENV') && APP_ENV === 'production') {
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(0);
+} else {
+    // En développement, logger les erreurs mais ne pas les afficher sur les pages
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    ini_set('log_errors', 1);
+    error_reporting(E_ALL);
+}
+require_once __DIR__ . '/core/Router.php';
+require_once __DIR__ . '/core/Controller.php';
+require_once __DIR__ . '/core/Database.php';
+require_once __DIR__ . '/core/EmailSender.php';
+
+require_once __DIR__ . '/controllers/GalleryController.php';
+require_once __DIR__ . '/controllers/AuthController.php';
+require_once __DIR__ . '/models/User.php';
+require_once __DIR__ . '/models/Image.php';

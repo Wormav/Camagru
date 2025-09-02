@@ -9,6 +9,7 @@ services:
       - ./assets:/var/www/html/assets
       - ./config:/var/www/html/config
       - ./uploads:/var/www/html/uploads
+      - ./.env:/var/www/html/.env
     environment:
       - DB_HOST=camagru-db
       - DB_NAME=${DB_NAME}
