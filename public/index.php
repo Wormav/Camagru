@@ -18,7 +18,8 @@ $router->get('/reset-password', 'AuthController@resetPasswordForm');
 $router->post('/reset-password', 'AuthController@resetPassword');
 $router->get('/camera', 'CameraController@index');
 $router->post('/camera/capture', 'CameraController@capture');
-$router->get('/profile', 'UserController@profile');
-$router->post('/profile/update', 'UserController@update');
+$router->get('/profile', 'ProfileController@index');
+$router->post('/profile/update', 'ProfileController@update');
+$router->post('/profile/upload-picture', 'ProfileController@uploadProfilePicture');
 
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

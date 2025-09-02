@@ -7,6 +7,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
+    <?php
+    // Synchroniser la session utilisateur si nécessaire
+    if (isset($_SESSION['user_id']) && !isset($_SESSION['profile_picture'])) {
+        $userModel = new User();
+        $user = $userModel->findById($_SESSION['user_id']);
+        if ($user) {
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['profile_picture'] = $user['profile_picture'];
+        }
+    }
+    ?>
     <header class="bg-white shadow-sm border-b">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -19,7 +31,28 @@
                     <a href="/gallery" class="text-gray-700 hover:text-gray-900">Gallery</a>
                     <a href="/camera" class="text-gray-700 hover:text-gray-900">Camera</a>
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <span class="text-gray-700">Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</span>
+                        <!-- Profile Picture -->
+                        <div class="relative">
+                            <a href="/profile" class="block">
+                                <div class="h-8 w-8 rounded-full overflow-hidden bg-gray-300 hover:ring-2 hover:ring-blue-500 transition-all duration-200">
+                                    <?php
+                                    // Debug temporaire
+                                    $sessionPicture = $_SESSION['profile_picture'] ?? 'null';
+                                    // echo "<!-- Debug: profile_picture = " . $sessionPicture . " -->";
+                                    ?>
+                                    <?php if (isset($_SESSION['profile_picture']) && $_SESSION['profile_picture']): ?>
+                                        <img class="h-full w-full object-cover"
+                                             src="/uploads/profiles/<?= htmlspecialchars($_SESSION['profile_picture']) ?>"
+                                             alt="<?= htmlspecialchars($_SESSION['username']) ?>"
+                                             title="<?= htmlspecialchars($_SESSION['username']) ?>">
+                                    <?php else: ?>
+                                        <div class="h-full w-full flex items-center justify-center text-lg">
+                                            😊
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </a>
+                        </div>
                         <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Logout</a>
                     <?php else: ?>
                         <a href="/login" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Login</a>
@@ -40,7 +73,21 @@
                     <a href="/gallery" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Gallery</a>
                     <a href="/camera" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Camera</a>
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <span class="block px-3 py-2 text-gray-700">Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</span>
+                        <!-- Profile in mobile menu -->
+                        <a href="/profile" class="flex items-center px-3 py-2 text-gray-700 hover:text-gray-900">
+                            <div class="h-6 w-6 rounded-full overflow-hidden bg-gray-300 mr-3">
+                                <?php if (isset($_SESSION['profile_picture']) && $_SESSION['profile_picture']): ?>
+                                    <img class="h-full w-full object-cover"
+                                         src="/uploads/profiles/<?= htmlspecialchars($_SESSION['profile_picture']) ?>"
+                                         alt="<?= htmlspecialchars($_SESSION['username']) ?>">
+                                <?php else: ?>
+                                    <div class="h-full w-full flex items-center justify-center text-sm">
+                                        😊
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            Profile (<?= htmlspecialchars($_SESSION['username']) ?>)
+                        </a>
                         <a href="/logout" class="block px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded">Logout</a>
                     <?php else: ?>
                         <a href="/login" class="block px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">Login</a>

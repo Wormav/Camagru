@@ -27,4 +27,16 @@ class Controller {
         echo json_encode($data);
         exit;
     }
+
+    protected function refreshUserSession() {
+        if (isset($_SESSION['user_id'])) {
+            $userModel = new User();
+            $user = $userModel->findById($_SESSION['user_id']);
+            if ($user) {
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['profile_picture'] = $user['profile_picture'];
+            }
+        }
+    }
 }

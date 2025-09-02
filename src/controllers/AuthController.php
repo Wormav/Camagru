@@ -175,6 +175,7 @@ class AuthController extends Controller {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['email'] = $user['email'];
+        $_SESSION['profile_picture'] = $user['profile_picture'];
 
         $this->redirect('/gallery');
     }
