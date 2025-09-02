@@ -135,16 +135,14 @@ function toggleLike(imageId) {
         if (data.success) {
             likeElement.textContent = data.like_count;
 
-            // Mettre à jour l'apparence du cœur
             if (data.liked) {
-                heartElement.textContent = '❤️'; // Cœur plein
+                heartElement.textContent = '❤️';
                 heartElement.style.color = '#DC2626';
             } else {
-                heartElement.textContent = '🤍'; // Cœur vide
+                heartElement.textContent = '🤍';
                 heartElement.style.color = '#EF4444';
             }
 
-            // Animation
             heartElement.style.transform = 'scale(1.3)';
             setTimeout(() => {
                 heartElement.style.transform = 'scale(1)';
@@ -159,10 +157,8 @@ function toggleLike(imageId) {
     });
 }
 
-// Charger l'état initial des likes
 document.addEventListener('DOMContentLoaded', function() {
     <?php if (isset($_SESSION['user_id'])): ?>
-        // Pour chaque image, vérifier si elle est likée
         const imageIds = [<?php
             $ids = [];
             foreach ($images as $img) {
@@ -179,9 +175,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const heartElement = document.querySelector('.heart-' + imageId);
                     if (heartElement) {
                         if (data.liked) {
-                            heartElement.textContent = '❤️'; // Cœur plein
+                            heartElement.textContent = '❤️';
                         } else {
-                            heartElement.textContent = '🤍'; // Cœur vide
+                            heartElement.textContent = '🤍';
                         }
                     }
                 }

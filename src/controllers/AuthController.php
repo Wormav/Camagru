@@ -3,7 +3,7 @@
 class AuthController extends Controller {
 
     public function registerForm() {
-        // Si l'utilisateur est déjà connecté, rediriger vers la gallery
+
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/gallery');
             return;
@@ -15,7 +15,7 @@ class AuthController extends Controller {
     }
 
     public function register() {
-        // Si l'utilisateur est déjà connecté, rediriger vers la gallery
+
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/gallery');
             return;
@@ -26,7 +26,6 @@ class AuthController extends Controller {
             return;
         }
 
-        // Validation CSRF
         $csrfToken = $_POST['csrf_token'] ?? '';
         if (!CSRFProtection::validateToken($csrfToken)) {
             $this->view('auth/register', [
@@ -116,7 +115,7 @@ class AuthController extends Controller {
     }
 
     public function loginForm() {
-        // Si l'utilisateur est déjà connecté, rediriger vers la gallery
+
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/gallery');
             return;
@@ -128,7 +127,7 @@ class AuthController extends Controller {
     }
 
     public function login() {
-        // Si l'utilisateur est déjà connecté, rediriger vers la gallery
+
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/gallery');
             return;
@@ -206,7 +205,7 @@ class AuthController extends Controller {
     }
 
     public function forgotPasswordForm() {
-        // Si l'utilisateur est déjà connecté, rediriger vers la gallery
+
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/gallery');
             return;
@@ -218,7 +217,7 @@ class AuthController extends Controller {
     }
 
     public function forgotPassword() {
-        // Si l'utilisateur est déjà connecté, rediriger vers la gallery
+
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/gallery');
             return;
@@ -229,7 +228,6 @@ class AuthController extends Controller {
             return;
         }
 
-        // Validation CSRF
         $csrfToken = $_POST['csrf_token'] ?? '';
         if (!CSRFProtection::validateToken($csrfToken)) {
             $this->view('auth/forgot-password', [
@@ -271,16 +269,13 @@ class AuthController extends Controller {
             return;
         }
 
-        // Générer un token de reset
         $resetToken = bin2hex(random_bytes(32));
 
-        // Sauvegarder le token en base
         if ($userModel->createResetToken($user['id'], $resetToken)) {
-            // Envoyer l'email
+
             $emailSender = new EmailSender();
             $emailSender->sendPasswordResetEmail($email, $user['username'], $resetToken);
 
-            // Afficher le message de succès
             $this->view('auth/forgot-password-sent', [
                 'title' => 'Reset Link Sent - Camagru',
                 'email' => $email
@@ -295,7 +290,7 @@ class AuthController extends Controller {
     }
 
     public function resetPasswordForm() {
-        // Si l'utilisateur est déjà connecté, rediriger vers la gallery
+
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/gallery');
             return;
@@ -310,7 +305,6 @@ class AuthController extends Controller {
             return;
         }
 
-        // Vérifier que le token existe et est valide
         $userModel = new User();
         $user = $userModel->findByResetToken($token);
 
@@ -328,7 +322,6 @@ class AuthController extends Controller {
     }
 
     public function resetPassword() {
-        // Si l'utilisateur est déjà connecté, rediriger vers la gallery
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/gallery');
             return;
@@ -339,7 +332,6 @@ class AuthController extends Controller {
             return;
         }
 
-        // Validation CSRF
         $csrfToken = $_POST['csrf_token'] ?? '';
         if (!CSRFProtection::validateToken($csrfToken)) {
             $this->view('auth/reset-error', [
@@ -392,7 +384,6 @@ class AuthController extends Controller {
             return;
         }
 
-        // Mettre à jour le mot de passe et supprimer le token
         if ($userModel->resetPassword($user['id'], $password)) {
             $this->view('auth/reset-success', [
                 'title' => 'Password Reset - Camagru'

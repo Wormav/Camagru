@@ -14,7 +14,6 @@ class Router {
     public function dispatch($uri, $method) {
         $path = parse_url($uri, PHP_URL_PATH);
 
-        // Chercher d'abord une correspondance exacte
         if (isset($this->routes[$method][$path])) {
             $handler = $this->routes[$method][$path];
             list($controller, $action) = explode('@', $handler);
@@ -24,7 +23,6 @@ class Router {
             return;
         }
 
-        // Chercher une correspondance avec paramètres
         foreach ($this->routes[$method] as $route => $handler) {
             if ($this->matchRoute($route, $path)) {
                 $params = $this->extractParams($route, $path);
@@ -32,7 +30,6 @@ class Router {
 
                 $controllerInstance = new $controller();
 
-                // Passer les paramètres à l'action
                 if (!empty($params)) {
                     call_user_func_array([$controllerInstance, $action], $params);
                 } else {
@@ -57,7 +54,7 @@ class Router {
         $routePattern = '#^' . $routePattern . '$#';
 
         if (preg_match($routePattern, $path, $matches)) {
-            array_shift($matches); // Enlever le match complet
+            array_shift($matches);
             return $matches;
         }
 

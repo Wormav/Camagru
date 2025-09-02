@@ -3,7 +3,6 @@
 class ProfileController extends Controller {
 
     public function index() {
-        // Vérifier que l'utilisateur est connecté
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
             return;
@@ -25,7 +24,6 @@ class ProfileController extends Controller {
     }
 
     public function update() {
-        // Vérifier que l'utilisateur est connecté
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
             return;
@@ -36,7 +34,6 @@ class ProfileController extends Controller {
             return;
         }
 
-        // Validation CSRF
         $csrfToken = $_POST['csrf_token'] ?? '';
         if (!CSRFProtection::validateToken($csrfToken)) {
             $userModel = new User();
@@ -67,7 +64,6 @@ class ProfileController extends Controller {
 
         $errors = [];
 
-        // Validation des champs de base
         if (empty($username)) {
             $errors[] = 'Username is required';
         } elseif (strlen($username) < 3 || strlen($username) > 50) {
@@ -82,17 +78,15 @@ class ProfileController extends Controller {
             $errors[] = 'Please enter a valid email address';
         }
 
-        // Vérifier que l'username n'est pas déjà pris (sauf par l'utilisateur actuel)
         if ($userModel->checkUsernameExists($username, $_SESSION['user_id'])) {
             $errors[] = 'Username is already taken';
         }
 
-        // Vérifier que l'email n'est pas déjà pris (sauf par l'utilisateur actuel)
+
         if ($userModel->checkEmailExists($email, $_SESSION['user_id'])) {
             $errors[] = 'Email is already taken';
         }
 
-        // Si un nouveau mot de passe est fourni, valider
         if (!empty($newPassword)) {
             if (empty($currentPassword)) {
                 $errors[] = 'Current password is required to change password';
@@ -120,14 +114,12 @@ class ProfileController extends Controller {
             return;
         }
 
-        // Mettre à jour le profil
         if ($userModel->updateProfile($_SESSION['user_id'], $username, $email, $notificationsEnabled)) {
-            // Si un nouveau mot de passe est fourni, le mettre à jour aussi
+
             if (!empty($newPassword)) {
                 $userModel->updatePassword($_SESSION['user_id'], $newPassword);
             }
 
-            // Mettre à jour la session avec les nouvelles informations
             $_SESSION['username'] = $username;
             $_SESSION['email'] = $email;
 
@@ -140,7 +132,7 @@ class ProfileController extends Controller {
     }
 
     public function uploadProfilePicture() {
-        // Vérifier que l'utilisateur est connecté
+
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
             return;
@@ -151,7 +143,6 @@ class ProfileController extends Controller {
             return;
         }
 
-        // Validation CSRF
         $csrfToken = $_POST['csrf_token'] ?? '';
         if (!CSRFProtection::validateToken($csrfToken)) {
             $_SESSION['error'] = 'Token CSRF invalide. Veuillez réessayer.';
@@ -169,7 +160,6 @@ class ProfileController extends Controller {
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         $maxSize = 5 * 1024 * 1024; // 5MB
 
-        // Validation du fichier
         if (!in_array($file['type'], $allowedTypes)) {
             $_SESSION['error'] = 'Only JPEG, PNG and GIF images are allowed.';
             $this->redirect('/profile');
@@ -182,18 +172,15 @@ class ProfileController extends Controller {
             return;
         }
 
-        // Créer le dossier de profil s'il n'existe pas
         $uploadDir = __DIR__ . '/../../public/uploads/profiles/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
 
-        // Générer un nom de fichier unique
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $fileName = 'profile_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
         $filePath = $uploadDir . $fileName;
 
-        // Supprimer l'ancienne photo de profil si elle existe
         $userModel = new User();
         $user = $userModel->findById($_SESSION['user_id']);
         if ($user && $user['profile_picture']) {
@@ -203,16 +190,12 @@ class ProfileController extends Controller {
             }
         }
 
-        // Déplacer le fichier uploadé
         if (move_uploaded_file($file['tmp_name'], $filePath)) {
-            // Mettre à jour la base de données
             if ($userModel->updateProfilePicture($_SESSION['user_id'], $fileName)) {
-                // Mettre à jour la session avec la nouvelle photo
                 $_SESSION['profile_picture'] = $fileName;
                 $_SESSION['success'] = 'Profile picture updated successfully!';
             } else {
                 $_SESSION['error'] = 'An error occurred while updating your profile picture.';
-                // Supprimer le fichier en cas d'erreur de base de données
                 if (file_exists($filePath)) {
                     unlink($filePath);
                 }

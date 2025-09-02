@@ -99,14 +99,13 @@ class Image {
             $existingLike = $stmt->fetch();
 
             if ($existingLike) {
-                // Supprimer le like existant
                 $stmt = $this->db->prepare("DELETE FROM likes WHERE user_id = ? AND image_id = ?");
                 $result = $stmt->execute([$userId, $imageId]);
                 if (!$result) {
                     throw new Exception('Failed to delete like');
                 }
                 $this->db->commit();
-                return false; // Pas liké maintenant
+                return false;
             } else {
                 // Ajouter un nouveau like
                 $stmt = $this->db->prepare("INSERT INTO likes (user_id, image_id) VALUES (?, ?)");
@@ -115,12 +114,12 @@ class Image {
                     throw new Exception('Failed to insert like');
                 }
                 $this->db->commit();
-                return true; // Liké maintenant
+                return true;
             }
         } catch (Exception $e) {
             $this->db->rollback();
             error_log("Error in toggleLike: " . $e->getMessage());
-            throw $e; // Relancer l'exception
+            throw $e;
         }
     }
 

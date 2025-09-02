@@ -2,7 +2,6 @@
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
             <div class="md:grid md:grid-cols-3 md:gap-6">
-                <!-- Profile Picture Section -->
                 <div class="md:col-span-1">
                     <div class="px-4 sm:px-0">
                         <h3 class="text-lg font-medium leading-6 text-gray-900">Profile Picture</h3>
@@ -53,7 +52,6 @@
         </div>
     </div>
 
-    <!-- Profile Information Section -->
     <div class="bg-white shadow rounded-lg mt-6">
         <div class="px-4 py-5 sm:p-6">
             <div class="md:grid md:grid-cols-3 md:gap-6">
@@ -67,7 +65,6 @@
                 </div>
 
                 <div class="mt-5 md:mt-0 md:col-span-2">
-                    <!-- Messages de succès/erreur -->
                     <?php if (isset($_SESSION['success'])): ?>
                         <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
                             <div class="flex">
@@ -171,7 +168,6 @@
                             </div>
                         </div>
 
-                        <!-- Notification Preferences -->
                         <div class="mt-8">
                             <h4 class="text-base font-medium text-gray-900 mb-4">Notification Preferences</h4>
                             <div class="grid grid-cols-6 gap-6">
@@ -203,7 +199,6 @@
         </div>
     </div>
 
-    <!-- Account Information -->
     <div class="bg-white shadow rounded-lg mt-6">
         <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Account Information</h3>
@@ -262,7 +257,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const file = e.target.files[0];
 
         if (file) {
-            // Validation du type de fichier
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
             if (!allowedTypes.includes(file.type)) {
                 alert('Please select a valid image file (JPEG, PNG, or GIF).');
@@ -270,21 +264,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Validation de la taille (5MB max)
-            const maxSize = 5 * 1024 * 1024; // 5MB
+            const maxSize = 5 * 1024 * 1024;
             if (file.size > maxSize) {
                 alert('Image file is too large. Maximum size is 5MB.');
                 fileInput.value = '';
                 return;
             }
 
-            // Créer la preview
             const reader = new FileReader();
             reader.onload = function(e) {
                 previewImage.src = e.target.result;
                 previewImage.classList.remove('hidden');
 
-                // Masquer l'image actuelle ou l'icône par défaut
                 if (currentImage) {
                     currentImage.classList.add('hidden');
                 }
@@ -292,7 +283,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     defaultImage.classList.add('hidden');
                 }
 
-                // Activer le bouton d'upload et afficher le bouton cancel
                 uploadButton.disabled = false;
                 uploadButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
                 uploadButton.classList.add('bg-blue-500', 'hover:bg-blue-600');
@@ -313,10 +303,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function resetPreview() {
-        // Masquer la preview
         previewImage.classList.add('hidden');
 
-        // Réafficher l'image actuelle ou l'icône par défaut
         if (currentImage) {
             currentImage.classList.remove('hidden');
         }
@@ -324,7 +312,6 @@ document.addEventListener('DOMContentLoaded', function() {
             defaultImage.classList.remove('hidden');
         }
 
-        // Désactiver le bouton d'upload et masquer le bouton cancel
         uploadButton.disabled = true;
         uploadButton.classList.add('bg-gray-400', 'cursor-not-allowed');
         uploadButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');

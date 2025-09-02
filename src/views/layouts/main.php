@@ -12,7 +12,6 @@ SecurityHeaders::setSecurityHeaders();
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <?php
-    // Synchroniser la session utilisateur si nécessaire
     if (isset($_SESSION['user_id']) && !isset($_SESSION['profile_picture'])) {
         $userModel = new User();
         $user = $userModel->findById($_SESSION['user_id']);
@@ -30,22 +29,15 @@ SecurityHeaders::setSecurityHeaders();
                     <a href="/" class="text-xl font-bold text-gray-900">Camagru</a>
                 </div>
 
-                <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-4">
                     <a href="/gallery" class="text-gray-700 hover:text-gray-900">Gallery</a>
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <a href="/camera" class="text-gray-700 hover:text-gray-900">Camera</a>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <!-- Profile Picture -->
                         <div class="relative">
                             <a href="/profile" class="block">
                                 <div class="h-8 w-8 rounded-full overflow-hidden bg-gray-300 hover:ring-2 hover:ring-blue-500 transition-all duration-200">
-                                    <?php
-                                    // Debug temporaire
-                                    $sessionPicture = $_SESSION['profile_picture'] ?? 'null';
-                                    // echo "<!-- Debug: profile_picture = " . $sessionPicture . " -->";
-                                    ?>
                                     <?php if (isset($_SESSION['profile_picture']) && $_SESSION['profile_picture']): ?>
                                         <img class="h-full w-full object-cover"
                                              src="/uploads/profiles/<?= htmlspecialchars($_SESSION['profile_picture']) ?>"
@@ -81,7 +73,6 @@ SecurityHeaders::setSecurityHeaders();
                         <a href="/camera" class="block px-3 py-2 text-gray-700 hover:text-gray-900">Camera</a>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <!-- Profile in mobile menu -->
                         <a href="/profile" class="flex items-center px-3 py-2 text-gray-700 hover:text-gray-900">
                             <div class="h-6 w-6 rounded-full overflow-hidden bg-gray-300 mr-3">
                                 <?php if (isset($_SESSION['profile_picture']) && $_SESSION['profile_picture']): ?>

@@ -29,7 +29,6 @@ class EmailSender {
         $this->log("Sujet: $subject");
         $this->log("Lien de vérification: $verificationLink");
 
-        // Vérification des constantes
         $this->log("MAIL_HOST: " . (defined('MAIL_HOST') ? MAIL_HOST : 'NON DÉFINI'));
         $this->log("MAIL_PORT: " . (defined('MAIL_PORT') ? MAIL_PORT : 'NON DÉFINI'));
         $this->log("MAIL_USERNAME: " . (defined('MAIL_USERNAME') ? MAIL_USERNAME : 'NON DÉFINI'));
@@ -37,7 +36,6 @@ class EmailSender {
         $this->log("MAIL_FROM: " . (defined('MAIL_FROM') ? MAIL_FROM : 'NON DÉFINI'));
         $this->log("APP_ENV: " . (defined('APP_ENV') ? APP_ENV : 'NON DÉFINI'));
 
-        // Toujours essayer d'envoyer via SMTP, même en développement
         $this->log("TENTATIVE D'ENVOI SMTP...");
         try {
             $result = $this->sendViaSMTP($email, $subject, $message);
@@ -46,7 +44,6 @@ class EmailSender {
         } catch (Exception $e) {
             $this->log("ERREUR SMTP: " . $e->getMessage());
 
-            // Fallback vers mail() avec configuration SMTP
             $this->log("Tentative avec mail() + configuration SMTP...");
             $result = $this->sendWithMailFunction($email, $subject, $message);
             $this->log("Résultat fallback: " . ($result ? 'SUCCÈS' : 'ÉCHEC'));
@@ -69,7 +66,6 @@ class EmailSender {
 
         $this->log("Connexion à $host:$port");
 
-        // Créer une connexion socket
         $smtp = fsockopen($host, $port, $errno, $errstr, 30);
         if (!$smtp) {
             throw new Exception("Impossible de se connecter à $host:$port - $errno: $errstr");
@@ -77,16 +73,13 @@ class EmailSender {
 
         $this->log("Connexion établie");
 
-        // Lire la réponse initiale
         $response = $this->readSMTPResponse($smtp);
         $this->log("Réponse initiale: " . trim($response));
 
-        // EHLO
         fputs($smtp, "EHLO " . ($_SERVER['HTTP_HOST'] ?? 'localhost') . "\r\n");
         $response = $this->readSMTPResponse($smtp);
         $this->log("EHLO: " . trim($response));
 
-        // STARTTLS
         fputs($smtp, "STARTTLS\r\n");
         $response = $this->readSMTPResponse($smtp);
         $this->log("STARTTLS: " . trim($response));
@@ -95,10 +88,8 @@ class EmailSender {
             throw new Exception("STARTTLS échoué: " . trim($response));
         }
 
-        // Activer le chiffrement TLS avec différentes méthodes
         $this->log("Tentative d'activation TLS...");
 
-        // Essayer d'abord TLSv1.2
         if (stream_socket_enable_crypto($smtp, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT)) {
             $this->log("TLS 1.2 activé avec succès");
         } elseif (stream_socket_enable_crypto($smtp, true, STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT)) {
@@ -109,42 +100,36 @@ class EmailSender {
             throw new Exception("Impossible d'activer TLS - Toutes les versions ont échoué");
         }
 
-        // EHLO après TLS
+
         fputs($smtp, "EHLO " . ($_SERVER['HTTP_HOST'] ?? 'localhost') . "\r\n");
         $response = $this->readSMTPResponse($smtp);
         $this->log("EHLO après TLS: " . trim($response));
 
-        // AUTH LOGIN
         fputs($smtp, "AUTH LOGIN\r\n");
         $response = $this->readSMTPResponse($smtp);
         $this->log("AUTH LOGIN: " . trim($response));
 
-        // Username
         fputs($smtp, base64_encode($username) . "\r\n");
         $response = $this->readSMTPResponse($smtp);
         $this->log("Username: " . trim($response));
 
-        // Password
+
         fputs($smtp, base64_encode($password) . "\r\n");
         $response = $this->readSMTPResponse($smtp);
         $this->log("Password: " . trim($response));
 
-        // MAIL FROM
         fputs($smtp, "MAIL FROM: <$from>\r\n");
         $response = $this->readSMTPResponse($smtp);
         $this->log("MAIL FROM: " . trim($response));
 
-        // RCPT TO
         fputs($smtp, "RCPT TO: <$to>\r\n");
         $response = $this->readSMTPResponse($smtp);
         $this->log("RCPT TO: " . trim($response));
 
-        // DATA
         fputs($smtp, "DATA\r\n");
         $response = $this->readSMTPResponse($smtp);
         $this->log("DATA: " . trim($response));
 
-        // Headers et message
         $headers = "From: $from\r\n";
         $headers .= "To: $to\r\n";
         $headers .= "Subject: $subject\r\n";
@@ -156,7 +141,6 @@ class EmailSender {
         $response = $this->readSMTPResponse($smtp);
         $this->log("Message envoyé: " . trim($response));
 
-        // QUIT
         fputs($smtp, "QUIT\r\n");
         fclose($smtp);
 
@@ -179,7 +163,6 @@ class EmailSender {
         $message .= "Best regards,\n";
         $message .= "The Camagru Team";
 
-        // Toujours essayer d'envoyer via SMTP, même en développement
         try {
             $result = $this->sendViaSMTP($email, $subject, $message);
             return $result;
@@ -195,8 +178,6 @@ class EmailSender {
             $line = fgets($smtp, 515);
             $response .= $line;
 
-            // Si la ligne commence par un code à 3 chiffres suivi d'un espace,
-            // c'est la dernière ligne de la réponse
             if (preg_match('/^\d{3} /', $line)) {
                 break;
             }
@@ -207,12 +188,10 @@ class EmailSender {
     private function sendWithMailFunction($to, $subject, $message) {
         $this->log("=== ENVOI AVEC MAIL() + CONFIGURATION SMTP ===");
 
-        // Configuration SMTP pour mail()
         ini_set('SMTP', MAIL_HOST);
         ini_set('smtp_port', MAIL_PORT);
         ini_set('sendmail_from', MAIL_FROM);
 
-        // Pour Gmail, on peut essayer avec des headers spéciaux
         $headers = array(
             'From: ' . MAIL_FROM,
             'Reply-To: ' . MAIL_FROM,
@@ -241,7 +220,6 @@ class EmailSender {
         $this->log("Destinataire: $email");
         $this->log("Sujet: $subject");
 
-        // Toujours essayer d'envoyer via SMTP
         $this->log("TENTATIVE D'ENVOI SMTP...");
         try {
             $result = $this->sendViaSMTP($email, $subject, $message);
@@ -250,10 +228,9 @@ class EmailSender {
         } catch (Exception $e) {
             $this->log("ERREUR SMTP: " . $e->getMessage());
 
-            // Fallback vers mail()
             $this->log("Tentative avec mail()...");
             try {
-                $result = $this->sendViaMail($email, $subject, $message);
+                $result = $this->sendWithMailFunction($email, $subject, $message);
                 $this->log("Résultat envoi mail(): " . ($result ? 'SUCCÈS' : 'ÉCHEC'));
                 return $result;
             } catch (Exception $e) {

@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Initialiser avec "aucun" sélectionné par défaut
     updateCaptureButton();
 });
 
@@ -84,7 +83,6 @@ function updateCaptureButton() {
 
     captureButton.disabled = !isEnabled;
 
-    // Mettre à jour les classes CSS selon l'état
     if (isEnabled) {
         captureButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
         captureButton.classList.add('bg-blue-500', 'hover:bg-blue-600');
@@ -100,14 +98,12 @@ function updatePreview() {
 
     overlayPreview.innerHTML = '';
 
-    // Ajouter le cadre si sélectionné
     if (selectedFrame && selectedFrame !== 'none') {
         const frameDiv = document.createElement('div');
         frameDiv.className = getFrameClass(selectedFrame);
         overlayPreview.appendChild(frameDiv);
     }
 
-    // Ajouter l'emoji si sélectionné
     if (selectedEmoji && selectedEmoji !== 'none') {
         const emojiDiv = document.createElement('div');
         emojiDiv.className = 'absolute bottom-2 right-2 text-4xl';
@@ -145,7 +141,6 @@ function capturePhoto() {
         formData.append('frame', selectedFrame || 'none');
         formData.append('emoji', selectedEmoji || 'none');
 
-        // Ajouter le token CSRF
         const csrfToken = document.getElementById('csrf-token')?.dataset.token;
         console.log('CSRF Token found:', csrfToken); // Debug
         if (csrfToken) {
@@ -190,7 +185,6 @@ function handleFileUpload(event) {
     formData.append('frame', selectedFrame || 'none');
     formData.append('emoji', selectedEmoji || 'none');
 
-    // Ajouter le token CSRF
     const csrfToken = document.getElementById('csrf-token')?.dataset.token;
     console.log('CSRF Token found in upload:', csrfToken); // Debug
     if (csrfToken) {
@@ -226,7 +220,6 @@ function deleteImage(imageId) {
     const formData = new FormData();
     formData.append('image_id', imageId);
 
-    // Ajouter le token CSRF
     const csrfToken = document.getElementById('csrf-token')?.dataset.token;
     if (csrfToken) {
         formData.append('csrf_token', csrfToken);

@@ -1,6 +1,5 @@
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <!-- Image principale -->
         <div class="relative">
             <div class="h-96 bg-gray-100 flex items-center justify-center p-4">
                 <img src="/uploads/<?= htmlspecialchars($image['filename']) ?>"
@@ -8,14 +7,12 @@
                      class="max-w-full max-h-full object-contain">
             </div>
 
-            <!-- Bouton retour -->
             <a href="/gallery"
                class="absolute top-4 left-4 bg-black bg-opacity-50 text-white px-3 py-2 rounded hover:bg-opacity-70 transition-all">
                 ← Back to Gallery
             </a>
         </div>
 
-        <!-- Informations image -->
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center space-x-3">
@@ -36,7 +33,6 @@
                     </div>
                 </div>
 
-                <!-- Like button -->
                 <div class="flex items-center space-x-4">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <button id="like-btn"
@@ -61,11 +57,9 @@
         </div>
     </div>
 
-    <!-- Section commentaires -->
     <div class="mt-6 bg-white rounded-lg shadow-md p-6">
         <h3 class="text-xl font-semibold mb-4">Comments</h3>
 
-        <!-- Formulaire ajout commentaire -->
         <?php if (isset($_SESSION['user_id'])): ?>
             <form id="comment-form" class="mb-6">
                 <div class="flex space-x-3">
@@ -100,9 +94,7 @@
             </div>
         <?php endif; ?>
 
-        <!-- Liste des commentaires -->
         <div id="comments-list">
-            <!-- Les commentaires seront chargés ici via JavaScript -->
         </div>
     </div>
 </div>
@@ -180,7 +172,6 @@ function addComment() {
         return;
     }
 
-    // Désactiver le bouton et afficher le loading
     submitBtn.disabled = true;
     submitText.classList.add('hidden');
     submitLoading.classList.remove('hidden');
@@ -209,7 +200,6 @@ function addComment() {
         alert('An error occurred');
     })
     .finally(() => {
-        // Réactiver le bouton et masquer le loading
         submitBtn.disabled = false;
         submitText.classList.remove('hidden');
         submitLoading.classList.add('hidden');

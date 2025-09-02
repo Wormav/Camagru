@@ -2,19 +2,16 @@
 
 require_once '../src/bootstrap.php';
 
-// Si c'est une requête pour un fichier statique dans uploads, ne pas router
 $requestUri = $_SERVER['REQUEST_URI'];
 $parsedUrl = parse_url($requestUri);
 $path = $parsedUrl['path'];
 
 if (strpos($path, '/uploads/') === 0) {
-    // Tenter de servir le fichier directement
     $filePath = __DIR__ . $path;
     if (file_exists($filePath) && is_file($filePath)) {
-        // Déterminer le type MIME
+
         $mimeType = mime_content_type($filePath);
         if ($mimeType === false) {
-            // Fallback pour les types courants
             $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
             switch ($extension) {
                 case 'jpg':
@@ -62,8 +59,6 @@ $router->post('/camera/delete', 'CameraController@delete');
 $router->get('/profile', 'ProfileController@index');
 $router->post('/profile/update', 'ProfileController@update');
 $router->post('/profile/upload-picture', 'ProfileController@uploadProfilePicture');
-
-// Routes pour les images
 $router->get('/image/{id}', 'ImageController@show');
 $router->post('/image/like', 'ImageController@like');
 $router->get('/image/like-status', 'ImageController@likeStatus');
